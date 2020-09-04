@@ -1,4 +1,4 @@
-use bevy_ecs::Resources;
+use crate::Resources;
 use bevy_tasks::{AsyncComputeTaskPool, ComputeTaskPool, IOTaskPool, TaskPoolBuilder};
 
 /// Defines a simple way to determine how many threads to use given the number of remaining cores
@@ -26,7 +26,7 @@ impl TaskPoolThreadAssignmentPolicy {
         // Clamp by min_threads, max_threads. (This may result in us using more threads than are
         // available, this is intended. An example case where this might happen is a device with
         // <= 2 threads.
-        bevy_math::clamp(desired, self.min_threads, self.max_threads)
+        clamp(desired, self.min_threads, self.max_threads)
     }
 }
 
@@ -91,7 +91,7 @@ impl DefaultTaskPoolOptions {
 
     /// Inserts the default thread pools into the given resource map based on the configured values
     pub fn create_default_pools(&self, resources: &mut Resources) {
-        let total_threads = bevy_math::clamp(
+        let total_threads = clamp(
             bevy_tasks::logical_core_count(),
             self.min_total_threads,
             self.max_total_threads,
@@ -149,5 +149,16 @@ impl DefaultTaskPoolOptions {
                     .build(),
             ));
         }
+    }
+}
+
+//Only function we would use from bevy_math
+fn clamp(input: usize, min: usize, max: usize) -> usize {
+    if input < min {
+        min
+    } else if input > max {
+        max
+    } else {
+        input
     }
 }

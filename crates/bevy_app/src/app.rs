@@ -1,5 +1,5 @@
-use crate::{app_builder::AppBuilder, DefaultTaskPoolOptions};
-use bevy_ecs::{ParallelExecutor, Resources, Schedule, World};
+use crate::app_builder::AppBuilder;
+use bevy_ecs::{Executor, ParallelExecutor, Resources, Schedule, World};
 
 #[allow(clippy::needless_doctest_main)]
 /// Containers of app logic and data
@@ -28,9 +28,9 @@ pub struct App {
     pub resources: Resources,
     pub runner: Box<dyn Fn(App)>,
     pub schedule: Schedule,
-    pub executor: ParallelExecutor,
+    pub executor: Box<dyn Executor>,
     pub startup_schedule: Schedule,
-    pub startup_executor: ParallelExecutor,
+    pub startup_executor: Box<dyn Executor>,
 }
 
 impl Default for App {
@@ -39,9 +39,9 @@ impl Default for App {
             world: Default::default(),
             resources: Default::default(),
             schedule: Default::default(),
-            executor: Default::default(),
+            executor: Box::new(ParallelExecutor::default()),
             startup_schedule: Default::default(),
-            startup_executor: ParallelExecutor::without_tracker_clears(),
+            startup_executor: Box::new(ParallelExecutor::without_tracker_clears()),
             runner: Box::new(run_once),
         }
     }
@@ -58,18 +58,14 @@ impl App {
 
     pub fn update(&mut self) {
         self.schedule.initialize(&mut self.resources);
+        self.executor.initialize(&mut self.resources);
         self.executor
             .run(&mut self.schedule, &mut self.world, &mut self.resources);
     }
 
     pub fn run(mut self) {
-        // Setup the default bevy task pools
-        self.resources
-            .get_cloned::<DefaultTaskPoolOptions>()
-            .unwrap_or_else(DefaultTaskPoolOptions::default)
-            .create_default_pools(&mut self.resources);
-
         self.startup_schedule.initialize(&mut self.resources);
+        self.startup_executor.initialize(&mut self.resources);
         self.startup_executor.run(
             &mut self.startup_schedule,
             &mut self.world,

@@ -6,7 +6,7 @@ use crate::{
     plugin::Plugin,
     stage, startup_stage,
 };
-use bevy_ecs::{FromResources, IntoQuerySystem, Resources, System, World};
+use bevy_ecs::{Executor, FromResources, IntoQuerySystem, Resources, System, World};
 
 /// Configure [App]s using the builder pattern
 pub struct AppBuilder {
@@ -214,6 +214,16 @@ impl AppBuilder {
         let resource = R::from_resources(&self.app.resources);
         self.app.resources.insert(resource);
 
+        self
+    }
+
+    pub fn set_executor(&mut self, executor: Box<dyn Executor>) -> &mut Self {
+        self.app.executor = executor;
+        self
+    }
+
+    pub fn set_startup_executor(&mut self, executor: Box<dyn Executor>) -> &mut Self {
+        self.app.startup_executor = executor;
         self
     }
 

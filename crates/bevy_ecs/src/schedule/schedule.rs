@@ -162,7 +162,6 @@ impl Schedule {
         resources.clear_trackers();
     }
 
-    // TODO: move this code to ParallelExecutor
     pub fn initialize(&mut self, resources: &mut Resources) {
         if self.last_initialize_generation == self.generation {
             return;

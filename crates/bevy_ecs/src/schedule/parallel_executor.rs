@@ -2,12 +2,16 @@ use super::Schedule;
 use crate::{
     resource::Resources,
     system::{ArchetypeAccess, System, ThreadLocalExecution, TypeAccess},
+    Executor,
 };
 use bevy_hecs::{ArchetypesGeneration, World};
 use bevy_tasks::{ComputeTaskPool, CountdownEvent, TaskPool};
 use fixedbitset::FixedBitSet;
 use parking_lot::Mutex;
 use std::{ops::Range, sync::Arc};
+
+mod task_pool_options;
+pub use task_pool_options::{DefaultTaskPoolOptions, TaskPoolThreadAssignmentPolicy};
 
 /// Executes each schedule stage in parallel by analyzing system dependencies.
 /// System execution order is undefined except under the following conditions:
@@ -41,8 +45,10 @@ impl ParallelExecutor {
             ..Default::default()
         }
     }
+}
 
-    pub fn run(&mut self, schedule: &mut Schedule, world: &mut World, resources: &mut Resources) {
+impl Executor for ParallelExecutor {
+    fn run(&mut self, schedule: &mut Schedule, world: &mut World, resources: &mut Resources) {
         let schedule_generation = schedule.generation();
         let schedule_changed = schedule.generation() != self.last_schedule_generation;
         if schedule_changed {
@@ -64,6 +70,13 @@ impl ParallelExecutor {
         }
 
         self.last_schedule_generation = schedule_generation;
+    }
+
+    fn initialize(&mut self, resources: &mut Resources) {
+        resources
+            .get_cloned::<DefaultTaskPoolOptions>()
+            .unwrap_or_default()
+            .create_default_pools(resources);
     }
 }
 
@@ -513,7 +526,7 @@ impl ExecutorStage {
 
 #[cfg(test)]
 mod tests {
-    use super::ParallelExecutor;
+    use super::{Executor, ParallelExecutor};
     use crate::{
         resource::{Res, ResMut, Resources},
         schedule::Schedule,
