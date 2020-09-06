@@ -8,6 +8,9 @@ pub struct WinitWindows {
     pub winit_to_window_id: HashMap<winit::window::WindowId, WindowId>,
 }
 
+unsafe impl Send for WinitWindows {}
+unsafe impl Sync for WinitWindows {}
+
 impl WinitWindows {
     pub fn create_window(
         &mut self,
