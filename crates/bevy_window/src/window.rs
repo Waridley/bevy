@@ -5,7 +5,7 @@ pub struct WindowId(Uuid);
 
 impl WindowId {
     pub fn new() -> Self {
-        WindowId(Uuid::new_v4())
+        WindowId(Uuid::new_v4().unwrap())
     }
 
     pub fn primary() -> Self {

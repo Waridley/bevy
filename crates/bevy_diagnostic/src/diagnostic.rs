@@ -17,7 +17,7 @@ impl DiagnosticId {
 
 impl Default for DiagnosticId {
     fn default() -> Self {
-        DiagnosticId(Uuid::new_v4())
+        DiagnosticId(Uuid::new_v4().unwrap())
     }
 }
 

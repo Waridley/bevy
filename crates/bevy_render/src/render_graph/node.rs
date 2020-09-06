@@ -11,7 +11,7 @@ pub struct NodeId(Uuid);
 impl NodeId {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        NodeId(Uuid::new_v4())
+        NodeId(Uuid::new_v4().unwrap())
     }
 }
 

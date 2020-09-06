@@ -6,7 +6,7 @@ pub struct TextureId(Uuid);
 impl TextureId {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        TextureId(Uuid::new_v4())
+        TextureId(Uuid::new_v4().unwrap())
     }
 }
 
@@ -16,6 +16,6 @@ pub struct SamplerId(Uuid);
 impl SamplerId {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        SamplerId(Uuid::new_v4())
+        SamplerId(Uuid::new_v4().unwrap())
     }
 }

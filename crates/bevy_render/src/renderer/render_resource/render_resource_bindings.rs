@@ -279,7 +279,7 @@ pub struct RenderResourceBindingsId(Uuid);
 
 impl Default for RenderResourceBindingsId {
     fn default() -> Self {
-        RenderResourceBindingsId(Uuid::new_v4())
+        RenderResourceBindingsId(Uuid::new_v4().unwrap())
     }
 }
 
