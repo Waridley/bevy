@@ -12,6 +12,11 @@ categories = ["game-engines", "graphics", "gui", "rendering"]
 readme = "README.md"
 exclude = ["assets/**/*", "tools/**/*", ".github/**/*", "crates/**/*"]
 
+
+[patch.crates-io.uuid] # Adds v4 support for WASI, recently merged into master
+git = "https://github.com/uuid-rs/uuid.git"
+
+
 [features]
 default = [
     "bevy_audio", "bevy_gltf", "bevy_wgpu", "bevy_winit",
